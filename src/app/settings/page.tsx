@@ -5,6 +5,11 @@ import { db } from '@/db';
 
 export default function Settings() {
     const [cash, setCash] = useLocalStorage("cash", 1000.00);
+    const [fee, setFee] = useLocalStorage("fee", 2.5)
+    if (fee == undefined) {
+        setFee(2.5);
+    }
+
     if (cash == null || Number.isNaN(cash)) {
         setCash(1000.00);
     }
@@ -36,6 +41,16 @@ export default function Settings() {
             setCalculate(false)
         }
     }
+    function setFeePercentage() {
+        // @ts-ignore
+        let p = parseFloat((document.getElementById('percent')).value);
+        if (p > 100 || p < 0) {
+            alert('The percentage that you entered is not a valid percentage.');
+            return;
+        } else {
+            setFee(p)
+        }
+    }
     return (
         <div className='container'>
             <a href='/'>Home</a>
@@ -55,14 +70,27 @@ export default function Settings() {
                 </div>
                 <div className='setting'>
                     <div className='smor'>
-                        <h2>Calculate Profits and Losses</h2>
-                        <p>(API INTENSIVE), every time you open Stockr, the system will calculate the profits and losses in your portfolio.</p>
+                        <h2>Fees</h2>
+                        <p>Simulate a percentage fee cut from all sales 💪<br/>Cut is {fee}%</p>
                     </div>
                     <div className='smodifier' id='free-width'>
-                        <label htmlFor='calculate'>Calculate Profits and Losses<input type='checkbox' id='calculate' name='Calculate' onClick={enableorDisable} defaultChecked={calculate}/>
+                        <label htmlFor='calculate'>Simulate Cut <input type='checkbox' id='calculate' name='Calculate' onClick={enableorDisable} defaultChecked={calculate}/>
                         </label>
                     </div>
                 </div>
+                {calculate ? <>
+                    <div className='setting'>
+                    <div className='smor'>
+                        <h2>Set Fee</h2>
+                        <p>Customize the fee assessed, in percent.</p>
+                    </div>
+                    <div className='smodifier'>
+                        <input type='number' id='percent' />
+                        <button onClick={setFeePercentage}>Set</button>
+                    </div>
+                </div>
+
+                </> : <></>}
                 <div className='setting'>
                     <div className='smor'>
                         <h2>Danger Zone</h2>

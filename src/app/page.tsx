@@ -14,9 +14,10 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [stocks_data, setStocksData] = useState([]);
   const [calculate, setCalculate] = useLocalStorage("calculate", false);
-  const getPRef = useRef(null);
-  if (calculate == null) {
-      setCalculate(false);
+  const [fee, setFee] = useLocalStorage("fee", 2.5)
+
+  if (fee == undefined) {
+    setFee(2.5);
   }
 
   function buyStock() {
@@ -36,11 +37,20 @@ export default function Home() {
       }
       setCash(cash - (price * quantity));
       let portfolio = getCookie('portfolio');
-      db.collection('portfolio').add({
-        ticker: ticker,
-        quantity: quantity,
-        initPrice: price
-      });
+      // @ts-ignore
+      db.collection('portfolio').doc({ticker: ticker}).limit(1).get().then(data => {
+        if (data == undefined) {
+          db.collection('portfolio').add({
+            ticker: ticker,
+            quantity: quantity,
+            initPrice: price
+          });
+        } else {
+          db.collection('portfolio').doc({ticker: ticker, quantity: data.quantity, initPrice: parseFloat(data.initPrice)}).update({
+            quantity: (parseInt(data.quantity) + parseInt(quantity)).toString()
+          })
+        }
+      })
     }))
   }
   function searchStock() {
@@ -71,8 +81,24 @@ export default function Home() {
     fetch('/api/get_stocks', { method: 'POST', body: JSON.stringify({'ticker': ticker}) }).then(r => r.json().then(data => {
       stockInfo = data.stock_information;
       let price = parseFloat(stockInfo['05. price']);
-      setCash(cash + (price * quantity));
-      db.collection('portfolio').doc({ticker: ticker}).delete();      
+      // @ts-ignore
+      db.collection('portfolio').doc({ticker: ticker}).limit(1).get().then(d => {
+        if (parseInt(d.quantity) - quantity > 0) {
+          db.collection('portfolio').doc({ticker: ticker}).limit(1).update({
+            quantity: parseInt(d.quantity) - quantity
+          })
+          setCash(cash + (price * quantity));
+        } else if (quantity > d.quantity) {
+          alert('You do not own enough quantity of this stock or do not own this stock.')
+          return
+        } else {
+          db.collection('portfolio').doc({ticker: ticker}).limit(1).delete();
+          setCash(cash + (price * quantity));
+        }
+      })
+      if (calculate == true) {
+        setCash(cash - (price * quantity * (fee/100)))
+      }    
     }))
   }
   useEffect(() => {
@@ -81,11 +107,6 @@ export default function Home() {
       setStocksData(data);
       setLoading(false);
     })
-    getPRef.current = function getPrice(ticker: string) {
-      fetch('/api/get_stocks', { method: 'POST', body: JSON.stringify({'ticker': ticker}) }).then(r => r.json().then(data => {
-        return parseFloat(data.stock_information['05. price']);
-      }))
-    }
   
   }, [])
 
@@ -112,7 +133,6 @@ export default function Home() {
                 <p>Ticker</p>
                 <p>Quantity</p>
                 <p>Price Bought (Each)</p>
-                {calculate ? <p>Initial Total Price Bought</p> : <></>}
               </div>
             {stocks_data.map(stock => {
               return (
@@ -124,7 +144,6 @@ export default function Home() {
                   {/* @ts-ignore */}
                   <p key={stock}>{stock.initPrice} {localCurrency}</p>
                   {/* @ts-ignore */}
-                  {calculate ? <p key={stock}>{stock.initPrice * stock.quantity} {localCurrency}</p> : <></>}
                 </div>
               )
             })}</>}</>)}
