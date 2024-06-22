@@ -15,7 +15,11 @@ export default function Home() {
   const [stocks_data, setStocksData] = useState([]);
   const [calculate, setCalculate] = useLocalStorage("calculate", false);
   const [fee, setFee] = useLocalStorage("fee", 2.5)
+  const [logging, setLogging] = useLocalStorage("logging", false);
 
+  if (logging == undefined) {
+    setLogging(false);
+  }
   if (fee == undefined) {
     setFee(2.5);
   }
@@ -171,6 +175,16 @@ export default function Home() {
             <button onClick={sellStock}>Sell</button>
           </div>
         </div>
+        {/* The entirely logging region of the site */}
+        {logging ? <div className='summative'>
+          <h2>Logs</h2>
+          <p>Logging all transactions made and storing locally.</p>
+           </div> : <></>
+        }
+      <footer className='footer'>
+        <p>Stockr, a simple stock market simulator</p>
+        <p>Created by <a href='https://github.com/de-y'>de-y</a>.</p>
+      </footer>
       </div>
     </>
   );

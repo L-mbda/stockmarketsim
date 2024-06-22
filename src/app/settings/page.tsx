@@ -6,10 +6,24 @@ import { db } from '@/db';
 export default function Settings() {
     const [cash, setCash] = useLocalStorage("cash", 1000.00);
     const [fee, setFee] = useLocalStorage("fee", 2.5)
+    const [logging, setLogging] = useLocalStorage("logging", false);
+
+    if (logging == undefined) {
+        setLogging(false);
+    }
+    function enableorDisableLogging() {
+        // @ts-ignore
+        let cbox = document.getElementById('logging');
+        // @ts-ignore
+        if (cbox.checked) {
+            setLogging(true)
+        } else {
+            setLogging(false)
+        }
+    }
     if (fee == undefined) {
         setFee(2.5);
     }
-
     if (cash == null || Number.isNaN(cash)) {
         setCash(1000.00);
     }
@@ -91,6 +105,16 @@ export default function Settings() {
                 </div>
 
                 </> : <></>}
+                <div className='setting'>
+                <div className='smor'>
+                        <h2>Logs</h2>
+                        <p>Start a log of all transactions made with buying and selling stocks</p>
+                    </div>
+                    <div className='smodifier' id='free-width'>
+                        <label htmlFor='logging'>Enable Logging <input type='checkbox' id='logging' name='Logging' onClick={enableorDisableLogging} defaultChecked={logging}/>
+                        </label>
+                    </div>
+                </div>
                 <div className='setting'>
                     <div className='smor'>
                         <h2>Danger Zone</h2>

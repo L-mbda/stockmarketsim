@@ -37,3 +37,12 @@ button {
     border-radius: 10px;
     border: 2px solid black;
 }
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+.footer a {
+    color: rgb(3, 172, 87);
+}
