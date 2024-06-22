@@ -1,4 +1,4 @@
-import Prisma from '@prisma/client'
+// @ts-ignore
+import Localbase from 'localbase'
 
-const db = new Prisma.PrismaClient()
-export default db
+export const db = new Localbase('db')

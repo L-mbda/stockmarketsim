@@ -11,7 +11,9 @@
   "dependencies": {
     "@prisma/client": "5.15.1",
     "axios": "^1.7.2",
+    "cookies-next": "^4.2.1",
     "currency-converter-lt": "^2.0.1",
+    "localbase": "^0.7.6",
     "next": "14.2.4",
     "prisma": "^5.15.1",
     "react": "^18",

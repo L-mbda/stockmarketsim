@@ -28,3 +28,20 @@
     background-color: rgb(47, 124, 2);
     padding: 5px;
 }
+
+input {
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    margin: 5px;
+    background-color: rgb(41, 41, 41);
+    color: white;
+}
+
+button {
+    padding: 10px;
+    background-color: black;
+    color: white;
+    border-radius: 10px;
+    border: 2px solid black;
+}
