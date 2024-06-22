@@ -3,7 +3,7 @@ import '@/css/stonk.css'
 import useLocalStorage from "use-local-storage";
 import { getCookie, setCookie } from 'cookies-next';
 import { db } from '@/db';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
   const [cash, setCash] = useLocalStorage("cash", 1000.00);
@@ -13,6 +13,11 @@ export default function Home() {
   const [localCurrency, setLocalCurrency] = useLocalStorage("currency", "USD");
   const [loading, setLoading] = useState(true);
   const [stocks_data, setStocksData] = useState([]);
+  const [calculate, setCalculate] = useLocalStorage("calculate", false);
+  const getPRef = useRef(null);
+  if (calculate == null) {
+      setCalculate(false);
+  }
 
   function buyStock() {
     // @ts-ignore
@@ -76,31 +81,53 @@ export default function Home() {
       setStocksData(data);
       setLoading(false);
     })
+    getPRef.current = function getPrice(ticker: string) {
+      fetch('/api/get_stocks', { method: 'POST', body: JSON.stringify({'ticker': ticker}) }).then(r => r.json().then(data => {
+        return parseFloat(data.stock_information['05. price']);
+      }))
+    }
+  
   }, [])
+
+  function settings() {
+    return window.location.href = '/settings';
+  }
   return (
     <>
       <div className='container'>
         <div className='summative'>
           <h1>Stockr: A simple stock market simulator</h1>
           <p>Current balance: {cash} {localCurrency}</p>
+          <button onClick={settings}>Settings</button>
+
         </div>
         <div className='summative'>
           <h2>Stock Market</h2>
           <div className='stocks'>
             <p>Owned Stocks</p>
             <p>Please note that stats are not real-time and may be delayed.</p>
-            {loading ? <p>Loading...</p> : (<>{stocks_data.map(stock => {
+            {loading ? <p>Querying...</p> : (<>
+            {stocks_data.length == 0 ? <p>No stocks owned.</p> : <>
+              <div className='stock' >
+                <p>Ticker</p>
+                <p>Quantity</p>
+                <p>Price Bought (Each)</p>
+                {calculate ? <p>Initial Total Price Bought</p> : <></>}
+              </div>
+            {stocks_data.map(stock => {
               return (
                 <div className='stock' key={stock}>
                   {/* @ts-ignore */}
-                  <p key={stock}>Ticker: {stock.ticker}</p>
+                  <p key={stock}>{stock.ticker}</p>
                   {/* @ts-ignore */}
-                  <p key={stock}>Quantity: {stock.quantity}</p>
+                  <p key={stock}>{stock.quantity}</p>
                   {/* @ts-ignore */}
-                  <p key={stock}>Price Bought:  {stock.initPrice}</p>
+                  <p key={stock}>{stock.initPrice} {localCurrency}</p>
+                  {/* @ts-ignore */}
+                  {calculate ? <p key={stock}>{stock.initPrice * stock.quantity} {localCurrency}</p> : <></>}
                 </div>
               )
-            })}</>)}
+            })}</>}</>)}
           </div>
           <div className='buy'>
             <p>Search Stocks</p>
