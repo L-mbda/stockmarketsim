@@ -7,8 +7,24 @@
     height: fit-content;
 }
 .summative {
-    border-radius: 10px;
-    border-color: rgb(36, 36, 36);
-    border-style: solid;
+    border: 2px solid rgb(36, 36, 36);
     padding: 10px;
+}
+.stocks {
+    display: flex;
+    flex-direction: column;
+}
+.stock {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+    align-items: center;
+    border: 2.4px solid rgb(46, 46, 46);
+}
+.price {
+    border: 2.4px solid rgb(47, 124, 2);
+    border-radius: 10px;
+    background-color: rgb(47, 124, 2);
+    padding: 5px;
 }
