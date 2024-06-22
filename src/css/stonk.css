@@ -3,4 +3,12 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    font-family: 'Raleway', sans-serif;
+    height: fit-content;
+}
+.summative {
+    border-radius: 10px;
+    border-color: rgb(36, 36, 36);
+    border-style: solid;
+    padding: 10px;
 }
